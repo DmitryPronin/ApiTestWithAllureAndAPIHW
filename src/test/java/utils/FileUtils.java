@@ -1,5 +1,7 @@
 package utils;
 
+import io.qameta.allure.Step;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FileUtils {
 
+    @Step("Запись idCart в файл {1}")
     public static void writeIdCartToFile(String pathFile, int idCart) throws IOException {
         FileOutputStream outputStream = new FileOutputStream(pathFile);
         byte[] strToBytes = String.valueOf(idCart).getBytes();
@@ -18,6 +21,7 @@ public class FileUtils {
         outputStream.close();
     }
 
+    @Step("Чтение idCart из файла {1}")
     public static String readIdCartFromFile(String pathToFile) throws IOException {
         Path path = Paths.get(pathToFile);
         List<String> allLines = Files.readAllLines(path, UTF_8);

@@ -1,5 +1,15 @@
 package tests;
 
+import io.qameta.allure.restassured.AllureRestAssured;
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeAll;
+
 public class BaseTest {
-    public static String BASE_URL = "https://www.petshop.ru";
+
+
+    @BeforeAll
+    static void setUp(){
+        RestAssured.baseURI = "https://www.petshop.ru";
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+    }
 }

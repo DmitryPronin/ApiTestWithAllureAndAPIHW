@@ -34,15 +34,14 @@ public class PetShopApiForUITest extends BaseTest {
         assertThat(idCart)
                 .as("idCart must be not null").isNotNull();
 
-        writeIdCartToFile("src/test/resources/idCart.txt", idCart);
+        writeIdCartToFile("src/test/resources/tempData/idCart.txt", idCart);
     }
 
     @DisplayName("Удаление товара из корзины")
     @Test
     @Order(2)
     void removeFromCard() throws IOException {
-        String path = "src/test/resources/idCart.txt";
-        String idCart = readIdCartFromFile(path);
+        String idCart = readIdCartFromFile("src/test/resources/tempData/idCart.txt");
 
         Response response = cartSteps.removeFromCart(String.valueOf(idCart), cookie);
         assertThat(response.statusCode())
