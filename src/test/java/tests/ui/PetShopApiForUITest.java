@@ -4,28 +4,46 @@ import cartSteps.CartSteps;
 import io.restassured.response.Response;
 import model.Cart;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import tests.BaseTest;
 
 import java.io.IOException;
+import java.util.Map;
 
+import static data.Uri.ADD_TO_CART;
+import static data.Uri.DELETE_FROM_CART;
+import static helpers.CustomAllureListener.withCustomTemplates;
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static utils.FileUtils.readIdCartFromFile;
 import static utils.FileUtils.writeIdCartToFile;
 
 public class PetShopApiForUITest extends BaseTest {
-    private final String cookie = "route=c89734fddd3807762176c479d95db98f; PHPSESSID=971b7ba7285765122bab090622172d96; BITRIX_SM_SALE_UID=1111330590; rrpvid=94; geo_city_id=a%3A2%3A%7Bs%3A7%3A%22city_id%22%3Bi%3A9%3Bs%3A13%3A%22is_determined%22%3Bb%3A1%3B%7D; showEcoSystem=true; confirmedCity=true";
-    private final CartSteps cartSteps = new CartSteps();
+    private static String cookie = "";
+    private static final CartSteps cartSteps = new CartSteps();
 
     @DisplayName("Добавление товара в корзину")
     @Test
-    @Order(1)
     void addToCard() throws IOException {
-        Response response = cartSteps.addToCart("209753", cookie);
+        String body = "{\"productId\":{productId},\"cartElementId\":0,\"quantity\":1}"
+                .replace("{productId}", "209753");
 
-        assertThat(response.statusCode())
-                .as("statusCode must be equal to 200").isEqualTo(200);
+        Response response = given()
+                .filter(withCustomTemplates())
+                .contentType("application/json;charset=UTF-8")
+                .body(body)
+                .cookie("cookie", cookie)
+                .log().all()
+                .when()
+                .post(ADD_TO_CART)
+                .then()
+                .statusCode(200)
+                .log().all()
+                .extract().response();
+
+        Map<String, String> allCookies = response.getCookies();
+
+        allCookies.forEach((key, value) -> cookie = cookie + key + "=" + value + "; ");
 
         Cart cart = response.as(Cart.class);
 
@@ -39,15 +57,30 @@ public class PetShopApiForUITest extends BaseTest {
 
     @DisplayName("Удаление товара из корзины")
     @Test
-    @Order(2)
     void removeFromCard() throws IOException {
+        Response response = cartSteps.addToCart("209753", cookie);
+        assertThat(response.statusCode()).isEqualTo(200);
+
         String idCart = readIdCartFromFile("src/test/resources/tempData/idCart.txt");
 
-        Response response = cartSteps.removeFromCart(String.valueOf(idCart), cookie);
-        assertThat(response.statusCode())
-                .as("statusCode must be to \"200\"").isEqualTo(200);
+        String uri = DELETE_FROM_CART
+                .replace("{idCard}", idCart);
+        System.out.println(uri);
 
-        Cart cart = response.as(Cart.class);
+        Response responseDeleteFromCart = given()
+                .filter(withCustomTemplates())
+                .contentType("application/json;charset=UTF-8")
+                .cookie("cookie", cookie)
+                .when()
+                .log().all()
+                .delete(uri)
+                .then()
+                .statusCode(200)
+                .log().all()
+                .extract().response();
+
+        Cart cart = responseDeleteFromCart.as(Cart.class);
+
         assertThat(cart.getCartItems().size())
                 .as("getCartItems size must be equal to \"0\"").isEqualTo(0);
     }

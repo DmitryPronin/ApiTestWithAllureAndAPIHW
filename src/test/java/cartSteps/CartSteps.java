@@ -39,10 +39,10 @@ public class CartSteps {
                 .contentType("application/json;charset=UTF-8")
                 .cookie("cookie", cookie)
                 .when()
-//                .log().all()
+                .log().all()
                 .delete(uri)
                 .then()
-//                .log().all()
+                .log().all()
                 .extract().response();
     }
 }
