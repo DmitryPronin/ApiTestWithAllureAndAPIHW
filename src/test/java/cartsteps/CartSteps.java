@@ -1,7 +1,6 @@
-package cartSteps;
+package cartsteps;
 
 import io.qameta.allure.Step;
-import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.response.Response;
 
 import static data.Uri.ADD_TO_CART;

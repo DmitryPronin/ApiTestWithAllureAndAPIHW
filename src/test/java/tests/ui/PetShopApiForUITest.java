@@ -1,6 +1,6 @@
 package tests.ui;
 
-import cartSteps.CartSteps;
+import cartsteps.CartSteps;
 import io.restassured.response.Response;
 import model.Cart;
 import org.junit.jupiter.api.DisplayName;
